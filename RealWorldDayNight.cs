@@ -11,7 +11,7 @@ public class RealWorldDayNight : MonoBehaviour
     public float SunRiseTime = 8;
     public float SunSetTime = 8;
     private float TimeIntoDay;
-    private float TotalDayLength;
+    private float SolarDayLength;
 
     void Start()
     {
@@ -22,8 +22,8 @@ public class RealWorldDayNight : MonoBehaviour
     private void FixedUpdate()
     {
         //calls time refresh once per frame
-        CurrentHour = System.DateTime.UtcNow.Hour;
-        CurrentMinute = System.DateTime.UtcNow.Minute;
+        CurrentHour = System.DateTime.Now.Hour;
+        CurrentMinute = System.DateTime.Now.Minute;
 
         SunTime(CurrentHour, CurrentMinute);
     }
@@ -31,18 +31,27 @@ public class RealWorldDayNight : MonoBehaviour
     void SunTime(int Hour, float Minuet)
     {
         //depending on when the sunrise and sunset is, will determin how long the day is
-        TotalDayLength = (12 - SunRiseTime) + SunSetTime;
+        SolarDayLength = (12 - SunRiseTime) + SunSetTime;
 
-        if (Hour == 12)
+        TimeIntoDay = Hour + Minuet / 60;
+
+        var SolarEnd = SunRiseTime + SolarDayLength;
+
+        if (TimeIntoDay < SunRiseTime)
         {
-            TimeIntoDay = (Hour - SunRiseTime) + Minuet / 60;
+            Sun.transform.rotation = Quaternion.Euler(185, eulerRotation.y, eulerRotation.z);
+        }
+        else if (TimeIntoDay > SolarEnd)
+        {
+            Sun.transform.rotation = Quaternion.Euler(185, eulerRotation.y, eulerRotation.z);
         }
         else
         {
-            TimeIntoDay = (12 - SunRiseTime) + Hour + Minuet / 60;
-        }
+            //if time is in solar window
+            var cTime = TimeIntoDay - SunRiseTime;
 
-        //sets sun rotation based on 185 degrees of rotation (I find works nicely for unity's Directional light) and the percentage of time into the Solarday
-        Sun.transform.rotation = Quaternion.Euler(TimeIntoDay * 185 / TotalDayLength, eulerRotation.y, eulerRotation.z);
+            //sets sun rotation based on 185 degrees of rotation (I find works nicely for unity's Directional light) and the percentage of time into the Solarday
+            Sun.transform.rotation = Quaternion.Euler(cTime * 185 / SolarDayLength, eulerRotation.y, eulerRotation.z);
+        }
     }
 }
