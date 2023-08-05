@@ -21,8 +21,6 @@ public class RealWorldDayNight : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (SunSetTime > 12) SunSetTime += 12;
-
         //calls time refresh once per frame
         CurrentHour = System.DateTime.Now.Hour;
         CurrentMinute = System.DateTime.Now.Minute;
